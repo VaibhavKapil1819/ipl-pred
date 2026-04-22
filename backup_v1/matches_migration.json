@@ -1,0 +1,108 @@
+{
+  "matches": {
+    "m1": {
+      "team1": "RCB",
+      "team2": "SRH",
+      "winner": "RCB",
+      "preds": {
+        "sai": "RCB",
+        "kar": "SRH",
+        "var": "SRH",
+        "cha": "SRH"
+      },
+      "ts": 1712590000000,
+      "num": "Match 1"
+    },
+    "m2": {
+      "team1": "CSK",
+      "team2": "RR",
+      "winner": "RR",
+      "preds": {
+        "sai": "CSK",
+        "kar": "RR",
+        "var": "RR",
+        "cha": "CSK"
+      },
+      "ts": 1712591000000,
+      "num": "Match 2"
+    },
+    "m3": {
+      "team1": "SRH",
+      "team2": "KKR",
+      "winner": "SRH",
+      "preds": {
+        "sai": "KKR",
+        "kar": "SRH",
+        "var": "SRH",
+        "cha": "SRH"
+      },
+      "ts": 1712592000000,
+      "num": "Match 3"
+    },
+    "m4": {
+      "team1": "CSK",
+      "team2": "PBKS",
+      "winner": "PBKS",
+      "preds": {
+        "sai": "",
+        "kar": "CSK",
+        "var": "PBKS",
+        "cha": ""
+      },
+      "ts": 1712593000000,
+      "num": "Match 4"
+    },
+    "m5": {
+      "team1": "RR",
+      "team2": "GT",
+      "winner": "RR",
+      "preds": {
+        "sai": "GT",
+        "kar": "GT",
+        "var": "RR",
+        "cha": "RR"
+      },
+      "ts": 1712594000000,
+      "num": "Match 5"
+    },
+    "m6": {
+      "team1": "SRH",
+      "team2": "LSG",
+      "winner": "LSG",
+      "preds": {
+        "sai": "LSG",
+        "kar": "SRH",
+        "var": "SRH",
+        "cha": "SRH"
+      },
+      "ts": 1712595000000,
+      "num": "Match 6"
+    },
+    "m7": {
+      "team1": "RCB",
+      "team2": "CSK",
+      "winner": "RCB",
+      "preds": {
+        "sai": "RCB",
+        "kar": "CSK",
+        "var": "CSK",
+        "cha": "CSK"
+      },
+      "ts": 1712596000000,
+      "num": "Match 7"
+    },
+    "m8": {
+      "team1": "RR",
+      "team2": "MI",
+      "winner": "RR",
+      "preds": {
+        "sai": "MI",
+        "kar": "RR",
+        "var": "RR",
+        "cha": "MI"
+      },
+      "ts": 1712597000000,
+      "num": "Match 8"
+    }
+  }
+}

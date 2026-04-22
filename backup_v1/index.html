@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPL Prediction League 🏏</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --orange: #FF6B00;
+      --yellow: #FFD700;
+      --green: #00C853;
+      --red: #e24b4a;
+      --bg: #0f1117;
+      --bg2: #1a1d27;
+      --bg3: #222537;
+      --txt: #ffffff;
+      --txt2: #888899;
+      --bdr: #ffffff18
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--txt);
+      min-height: 100vh
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--bdr);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 100
+    }
+
+    .nav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--orange)
+    }
+
+    .nav-brand span {
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      color: var(--txt2);
+      margin-left: 8px;
+      letter-spacing: 0
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .btn-login {
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--orange);
+      color: var(--orange);
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer
+    }
+
+    .btn-login:hover {
+      background: rgba(255, 107, 0, 0.1)
+    }
+
+    .admin-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--orange);
+      background: rgba(255, 107, 0, 0.1);
+      border: 1px solid rgba(255, 107, 0, 0.3);
+      border-radius: 20px;
+      padding: 4px 12px
+    }
+
+    .btn-logout {
+      background: none;
+      border: none;
+      color: var(--txt2);
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      padding: 4px 8px;
+      border-radius: 6px
+    }
+
+    .btn-logout:hover {
+      color: var(--red)
+    }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 24px 16px
+    }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+      flex-wrap: wrap
+    }
+
+    .tab {
+      padding: 7px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--bdr);
+      font-size: 13px;
+      cursor: pointer;
+      background: var(--bg2);
+      color: var(--txt2);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      transition: all 0.15s
+    }
+
+    .tab:hover {
+      border-color: var(--orange);
+      color: var(--orange)
+    }
+
+    .tab.active {
+      background: var(--orange);
+      color: #fff;
+      border-color: var(--orange)
+    }
+
+    /* ── LEADERBOARD ── */
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 24px
+    }
+
+    .score-card {
+      background: var(--bg2);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      border: 1px solid var(--bdr);
+      transition: border-color 0.2s
+    }
+
+    .score-card.leader {
+      border-color: var(--orange);
+      background: rgba(255, 107, 0, 0.06)
+    }
+
+    .sc-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 0 auto 8px
+    }
+
+    .sc-name {
+      font-size: 11px;
+      color: var(--txt2);
+      margin-bottom: 4px
+    }
+
+    .sc-pts {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 34px;
+      line-height: 1
+    }
+
+    .sc-pts small {
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      color: var(--txt2)
+    }
+
+    .sc-label {
+      font-size: 10px;
+      color: var(--orange);
+      margin-top: 2px
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--txt2);
+      margin-bottom: 10px
+    }
+
+    /* ── MATCH CARD ── */
+    .matches-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .match-card {
+      background: var(--bg2);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--bdr)
+    }
+
+    .match-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px
+    }
+
+    .match-teams {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 1px;
+      color: var(--txt)
+    }
+
+    .match-meta {
+      font-size: 11px;
+      color: var(--txt2);
+      margin-top: 2px
+    }
+
+    .match-actions {
+      display: flex;
+      gap: 6px
+    }
+
+    .btn-act {
+      background: none;
+      border: 1px solid var(--bdr);
+      border-radius: 6px;
+      color: var(--txt2);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 4px 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500
+    }
+
+    .btn-act.edit:hover {
+      border-color: var(--orange);
+      color: var(--orange)
+    }
+
+    .btn-act.del:hover {
+      border-color: var(--red);
+      color: var(--red)
+    }
+
+    .preds-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px
+    }
+
+    .pred-badge {
+      text-align: center;
+      padding: 8px 4px;
+      border-radius: 8px;
+      border: 1px solid var(--bdr)
+    }
+
+    .pred-badge.correct {
+      border-color: var(--green);
+      background: rgba(0, 200, 83, 0.08)
+    }
+
+    .pred-badge.wrong {
+      border-color: #e24b4a30;
+      background: rgba(226, 75, 74, 0.05)
+    }
+
+    .pb-name {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--txt2);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px
+    }
+
+    .pb-team {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--txt)
+    }
+
+    .pb-pts {
+      font-size: 10px;
+      margin-top: 3px;
+      font-weight: 600
+    }
+
+    .pred-badge.correct .pb-pts {
+      color: var(--green)
+    }
+
+    .pred-badge.wrong .pb-pts {
+      color: var(--red)
+    }
+
+    .winner-row {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .winner-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(255, 215, 0, 0.08);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 215, 0, 0.25)
+    }
+
+    .winner-badge span {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--yellow)
+    }
+
+    .winner-label {
+      font-size: 11px;
+      color: var(--txt2)
+    }
+
+    .pending-select {
+      flex: 1;
+      padding: 6px 10px;
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      background: var(--bg3);
+      color: var(--txt);
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif
+    }
+
+    .no-matches {
+      text-align: center;
+      padding: 3rem;
+      color: var(--txt2);
+      font-size: 14px
+    }
+
+    /* ── ADD MATCH FORM ── */
+    .form-card {
+      background: var(--bg2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      border: 1px solid var(--bdr)
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px
+    }
+
+    .field label {
+      font-size: 11px;
+      color: var(--txt2);
+      font-weight: 500
+    }
+
+    .field input,
+    .field select {
+      padding: 9px 12px;
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      background: var(--bg3);
+      color: var(--txt);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      width: 100%
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--orange)
+    }
+
+    .pred-form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 10px
+    }
+
+    .pred-form-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px
+    }
+
+    .pred-form-item label {
+      font-size: 11px;
+      color: var(--txt2);
+      font-weight: 500;
+      text-align: center
+    }
+
+    .pred-form-item select {
+      padding: 7px 4px;
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      background: var(--bg3);
+      color: var(--txt);
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+      text-align: center
+    }
+
+    .winner-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px
+    }
+
+    .winner-field label {
+      font-size: 11px;
+      color: var(--txt2);
+      font-weight: 500;
+      white-space: nowrap
+    }
+
+    .winner-field select {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      background: var(--bg3);
+      color: var(--txt);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 11px;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer
+    }
+
+    .btn-submit:hover {
+      opacity: 0.9
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed
+    }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 16px
+    }
+
+    .modal-overlay.open {
+      display: flex
+    }
+
+    .modal {
+      background: var(--bg2);
+      border-radius: 16px;
+      border: 1px solid var(--bdr);
+      padding: 20px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px
+    }
+
+    .modal-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 1px;
+      color: var(--orange)
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--txt2);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px
+    }
+
+    .btn-close:hover {
+      color: var(--txt)
+    }
+
+    .modal-section {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      color: var(--txt2);
+      margin: 14px 0 6px;
+      text-transform: uppercase
+    }
+
+    .modal-pred-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px
+    }
+
+    .modal-pred-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px
+    }
+
+    .modal-pred-item label {
+      font-size: 11px;
+      color: var(--txt2);
+      font-weight: 500
+    }
+
+    .modal-pred-item input {
+      padding: 8px 10px;
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      background: var(--bg3);
+      color: var(--txt);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      width: 100%
+    }
+
+    .modal-pred-item input:focus {
+      outline: none;
+      border-color: var(--orange)
+    }
+
+    .btn-save {
+      width: 100%;
+      padding: 11px;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      margin-top: 6px
+    }
+
+    /* ── LOGIN MODAL ── */
+    .login-box {
+      background: var(--bg2);
+      border-radius: 16px;
+      border: 1px solid var(--bdr);
+      padding: 28px;
+      width: 100%;
+      max-width: 360px
+    }
+
+    .login-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: var(--orange);
+      margin-bottom: 4px
+    }
+
+    .login-sub {
+      font-size: 13px;
+      color: var(--txt2);
+      margin-bottom: 20px
+    }
+
+    .login-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px
+    }
+
+    .login-field label {
+      font-size: 11px;
+      color: var(--txt2);
+      font-weight: 500
+    }
+
+    .login-field input {
+      padding: 10px 12px;
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      background: var(--bg3);
+      color: var(--txt);
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      width: 100%
+    }
+
+    .login-field input:focus {
+      outline: none;
+      border-color: var(--orange)
+    }
+
+    .btn-signin {
+      width: 100%;
+      padding: 11px;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      margin-top: 4px
+    }
+
+    .btn-signin:hover {
+      opacity: 0.9
+    }
+
+    .login-err {
+      font-size: 12px;
+      color: var(--red);
+      margin-top: 8px;
+      display: none
+    }
+
+    /* ── EXPORT ── */
+    .export-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px
+    }
+
+    .btn-exp {
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--bdr);
+      font-size: 12px;
+      cursor: pointer;
+      background: var(--bg2);
+      color: var(--txt2);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500
+    }
+
+    .btn-exp:hover {
+      border-color: var(--orange);
+      color: var(--orange)
+    }
+
+    .btn-exp.ok {
+      border-color: var(--green);
+      color: var(--green)
+    }
+
+    .btn-exp:disabled {
+      opacity: 0.5;
+      cursor: not-allowed
+    }
+
+    #export-preview {
+      width: 100%;
+      min-height: 220px;
+      background: var(--bg3);
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      color: var(--txt2);
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      resize: vertical;
+      padding: 10px;
+      outline: none
+    }
+
+    #img-preview-wrap {
+      margin-top: 12px;
+      display: none
+    }
+
+    #img-preview-wrap img {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--bdr)
+    }
+
+    .dl-btn {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none
+    }
+
+    /* ── LIVE INDICATOR ── */
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+      margin-right: 4px;
+      animation: pulse 1.8s infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.3
+      }
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #222;
+      color: #fff;
+      padding: 9px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 9999;
+      white-space: nowrap
+    }
+
+    .toast.show {
+      opacity: 1
+    }
+
+    /* ── LOADING ── */
+    #app-loading {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      flex-direction: column;
+      gap: 12px
+    }
+
+    .loading-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 3px;
+      color: var(--orange)
+    }
+
+    .loading-spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--bdr);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:500px) {
+      .scoreboard {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .preds-row {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .form-row {
+        grid-template-columns: 1fr
+      }
+
+      .pred-form-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .modal-pred-grid {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app-loading">
+    <div class="loading-logo">🏏 IPL Predictions</div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <nav>
+    <div>
+      <div class="nav-brand">IPL Predictions <span>🏏</span></div>
+    </div>
+    <div class="nav-right">
+      <span style="font-size:12px;color:var(--txt2)"><span class="live-dot"></span>Live</span>
+      <div id="nav-login-btn"><button class="btn-login" onclick="openLoginModal()">Admin Login</button></div>
+      <div id="nav-admin" style="display:none">
+        <div class="admin-badge">⚡ Admin <button class="btn-logout" onclick="doLogout()">Logout</button></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Login Modal -->
+  <div class="modal-overlay" id="login-modal" onclick="closeLoginOutside(event)">
+    <div class="login-box">
+      <div class="login-title">Admin Login</div>
+      <div class="login-sub">Only Vaibhav can log in here</div>
+      <div class="login-field"><label>Email</label><input type="email" id="login-email" placeholder="email@gmail.com" />
+      </div>
+      <div class="login-field"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••" />
+      </div>
+      <div class="login-err" id="login-err">Wrong email or password</div>
+      <button class="btn-signin" onclick="doLogin()">Sign In</button>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="edit-modal" onclick="closeEditOutside(event)">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title">Edit Match</div>
+        <button class="btn-close" onclick="closeEdit()">✕</button>
+      </div>
+      <div class="modal-section">Match Details</div>
+      <div class="form-row">
+        <div class="field"><label>Team 1</label><input type="text" id="e-t1" /></div>
+        <div class="field"><label>Team 2</label><input type="text" id="e-t2" /></div>
+      </div>
+      <div class="form-row" style="margin-bottom:0">
+        <div class="field"><label>Date</label><input type="date" id="e-date" /></div>
+        <div class="field"><label>Match No.</label><input type="text" id="e-num" /></div>
+      </div>
+      <div class="modal-section">Predictions</div>
+      <div class="modal-pred-grid" id="e-preds"></div>
+      <div class="modal-section">Actual Winner</div>
+      <select id="e-winner"
+        style="width:100%;padding:9px 12px;border:1px solid var(--bdr);border-radius:8px;background:var(--bg3);color:var(--txt);font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:10px">
+        <option value="">— Not decided —</option>
+      </select>
+      <button class="btn-save" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+
+  <div class="container" id="main-app" style="display:none">
+
+    <!-- Scoreboard -->
+    <div class="section-title">Leaderboard</div>
+    <div class="scoreboard" id="scoreboard"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('matches')">Matches</div>
+      <div class="tab" id="tab-add-btn" style="display:none" onclick="switchTab('add')">+ Add Match</div>
+      <div class="tab" onclick="switchTab('export-text')">Export Text</div>
+      <div class="tab" onclick="switchTab('export-img')">Export Image</div>
+    </div>
+
+    <!-- Matches Tab -->
+    <div id="tab-matches">
+      <div class="section-title">All Matches</div>
+      <div class="matches-list" id="matches-list">
+        <div class="no-matches">Loading matches...</div>
+      </div>
+    </div>
+
+    <!-- Add Match Tab (admin only) -->
+    <div id="tab-add" style="display:none">
+      <div class="section-title">Add New Match</div>
+      <div class="form-card">
+        <div class="form-row">
+          <div class="field"><label>Team 1</label><input type="text" id="f-t1" placeholder="e.g. CSK" /></div>
+          <div class="field"><label>Team 2</label><input type="text" id="f-t2" placeholder="e.g. MI" /></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>Match Date</label><input type="date" id="f-date" /></div>
+          <div class="field"><label>Match Number</label><input type="text" id="f-num" placeholder="e.g. Match 12" />
+          </div>
+        </div>
+        <div class="section-title" style="margin-bottom:8px">Predictions</div>
+        <div class="pred-form-grid" id="f-preds"></div>
+        <div class="winner-field">
+          <label>Actual Winner</label>
+          <select id="f-winner">
+            <option value="">— Select after match —</option>
+          </select>
+        </div>
+        <button class="btn-submit" onclick="addMatch()">+ Log Match</button>
+      </div>
+    </div>
+
+    <!-- Export Text Tab -->
+    <div id="tab-export-text" style="display:none">
+      <div class="section-title">Copy as Text</div>
+      <div class="export-bar">
+        <button class="btn-exp" onclick="copyLB(this)">🏆 Leaderboard</button>
+        <button class="btn-exp" onclick="copyTable(this)">📋 Match Table</button>
+        <button class="btn-exp" onclick="copyFull(this)">📄 Full Report</button>
+        <button class="btn-exp" onclick="copyCSV(this)">📊 CSV</button>
+      </div>
+      <textarea id="export-preview" readonly></textarea>
+      <button class="btn-exp" style="margin-top:10px;width:100%;justify-content:center" onclick="copyPreview(this)">Copy
+        to Clipboard</button>
+    </div>
+
+    <!-- Export Image Tab -->
+    <div id="tab-export-img" style="display:none">
+      <div class="section-title">Export as Image</div>
+      <div class="export-bar">
+        <button class="btn-exp" onclick="renderImg('leaderboard',this)">🏆 Leaderboard</button>
+        <button class="btn-exp" onclick="renderImg('table',this)">📋 Match Table</button>
+        <button class="btn-exp" onclick="renderImg('full',this)">📄 Full Scorecard</button>
+      </div>
+      <div id="img-preview-wrap">
+        <div style="font-size:11px;color:var(--txt2);margin-bottom:8px">Right-click image to save, or use download
+          button</div>
+        <img id="img-preview" src="" alt="" />
+        <a id="dl-link" class="dl-btn" download="ipl-predictions.png">⬇ Download Image</a>
+      </div>
+      <div id="img-loading" style="display:none;text-align:center;padding:2rem;color:var(--txt2);font-size:13px">
+        Generating image...</div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue, push, update, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDSrPok0eBRCMeTM2s1wKvWWPqt4SQvLr4",
+      authDomain: "ipl-predictions-a5f10.firebaseapp.com",
+      databaseURL: "https://ipl-predictions-a5f10-default-rtdb.firebaseio.com",
+      projectId: "ipl-predictions-a5f10",
+      storageBucket: "ipl-predictions-a5f10.firebasestorage.app",
+      messagingSenderId: "824242512776",
+      appId: "1:824242512776:web:f27d80519805b0cb1c503d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    console.log("Firebase initialized:", { projectId: firebaseConfig.projectId });
+
+    const PLAYERS = [
+      { id: 'sai', name: 'Sai Pavan', short: 'SP', color: '#FF6B00', bg: '#FF6B0020' },
+      { id: 'kar', name: 'Karthik', short: 'KC', color: '#4CAF50', bg: '#4CAF5020' },
+      { id: 'var', name: 'Vaibhav', short: 'VB', color: '#2196F3', bg: '#2196F320' },
+      { id: 'cha', name: 'Charan', short: 'CH', color: '#9C27B0', bg: '#9C27B020' },
+    ];
+
+    const ADMIN_EMAIL = 'vaibhavkapilkanuru@gmail.com';
+
+    let matches = [];
+    let isAdmin = false;
+    let editingId = null;
+
+    // ── AUTH ──
+    onAuthStateChanged(auth, user => {
+      console.log("Auth State Changed:", user ? `Logged in as ${user.email}` : "Not logged in");
+      isAdmin = !!(user && user.email === ADMIN_EMAIL);
+      document.getElementById('nav-login-btn').style.display = isAdmin ? 'none' : 'block';
+      document.getElementById('nav-admin').style.display = isAdmin ? 'block' : 'none';
+      document.getElementById('tab-add-btn').style.display = isAdmin ? 'flex' : 'none';
+      if (!isAdmin && currentTab === 'add') switchTab('matches');
+      renderAll();
+    }, error => {
+      console.error("Auth Error:", error);
+    });
+
+    window.doLogin = async () => {
+      const email = document.getElementById('login-email').value.trim();
+      const pass = document.getElementById('login-pass').value;
+      const err = document.getElementById('login-err');
+      err.style.display = 'none';
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        document.getElementById('login-modal').classList.remove('open');
+        showToast('Welcome Vaibhav! ⚡');
+      } catch (e) {
+        err.style.display = 'block';
+      }
+    };
+    window.doLogout = () => { signOut(auth); showToast('Logged out'); };
+    window.openLoginModal = () => {
+      document.getElementById('login-modal').classList.add('open');
+      setTimeout(() => document.getElementById('login-email').focus(), 100);
+    };
+    window.closeLoginOutside = e => { if (e.target === document.getElementById('login-modal')) document.getElementById('login-modal').classList.remove('open'); };
+
+    document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') window.doLogin(); });
+
+    // ── REALTIME DB ──
+    console.log("Starting to fetch matches...");
+    onValue(ref(db, 'matches'), snap => {
+      console.log("Matches data received:", snap.exists() ? "Data found" : "No data");
+      const data = snap.val() || {};
+      matches = Object.entries(data).map(([id, m]) => ({ ...m, id }))
+        .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      document.getElementById('app-loading').style.display = 'none';
+      document.getElementById('main-app').style.display = 'block';
+      renderAll();
+    }, error => {
+      console.error("Firebase Database Error:", error);
+      document.getElementById('app-loading').innerHTML = `
+    <div class="loading-logo">Error Loading Data</div>
+    <div style="color:var(--red); font-size: 14px; text-align: center; padding: 20px;">
+      ${error.message}<br>
+      Check your Firebase Rules and console logs.
+    </div>
+  `;
+    });
+
+    // Timeout fallback
+    setTimeout(() => {
+      if (document.getElementById('app-loading').style.display !== 'none') {
+        console.warn("Loading timeout: Data took too long to load.");
+        const msg = document.createElement('div');
+        msg.style.cssText = "color:var(--txt2); font-size: 12px; margin-top: 10px;";
+        msg.innerText = "Still loading? Check your internet connection or Firebase console.";
+        document.getElementById('app-loading').appendChild(msg);
+      }
+    }, 5000);
+
+    // ── ADD MATCH ──
+    function buildPredForm() {
+      const t1 = document.getElementById('f-t1').value.trim();
+      const t2 = document.getElementById('f-t2').value.trim();
+      const opts = `<option value="">Pick</option>${t1 ? `<option>${t1}</option>` : ''} ${t2 ? `<option>${t2}</option>` : ''}`;
+      document.getElementById('f-preds').innerHTML = PLAYERS.map(p =>
+        `<div class="pred-form-item"><label style="color:${p.color}">${p.name.split(' ')[0]}</label>
+     <select id="fp-${p.id}">${opts}</select></div>`).join('');
+      document.getElementById('f-winner').innerHTML = `<option value="">— Select after match —</option>${t1 ? `<option>${t1}</option>` : ''} ${t2 ? `<option>${t2}</option>` : ''}`;
+    }
+    ['f-t1', 'f-t2'].forEach(id => document.getElementById(id).addEventListener('input', buildPredForm));
+    buildPredForm();
+    document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+
+    window.addMatch = async () => {
+      if (!isAdmin) return;
+      const t1 = document.getElementById('f-t1').value.trim();
+      const t2 = document.getElementById('f-t2').value.trim();
+      if (!t1 || !t2) { showToast('Enter both team names'); return; }
+      const preds = {};
+      PLAYERS.forEach(p => { preds[p.id] = document.getElementById('fp-' + p.id).value; });
+      const btn = document.querySelector('#tab-add .btn-submit');
+      btn.disabled = true; btn.textContent = 'Saving...';
+      await push(ref(db, 'matches'), {
+        team1: t1, team2: t2,
+        date: document.getElementById('f-date').value,
+        num: document.getElementById('f-num').value || '',
+        preds, winner: document.getElementById('f-winner').value || '',
+        ts: Date.now()
+      });
+      ['f-t1', 'f-t2', 'f-num'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+      buildPredForm();
+      btn.disabled = false; btn.textContent = '+ Log Match';
+      showToast('Match logged! ✅');
+      switchTab('matches');
+    };
+
+    // ── SET WINNER ──
+    window.setWinner = async (id, val) => {
+      if (!isAdmin) return;
+      await update(ref(db, `matches/${id}`), { winner: val });
+      showToast('Winner set! 🏆');
+    };
+
+    // ── DELETE ──
+    window.deleteMatch = async id => {
+      if (!isAdmin) return;
+      if (!confirm('Delete this match?')) return;
+      await remove(ref(db, `matches/${id}`));
+      showToast('Match deleted');
+    };
+
+    // ── EDIT ──
+    window.openEdit = id => {
+      if (!isAdmin) return;
+      const m = matches.find(x => x.id === id);
+      if (!m) return;
+      editingId = id;
+      document.getElementById('e-t1').value = m.team1;
+      document.getElementById('e-t2').value = m.team2;
+      document.getElementById('e-date').value = m.date || '';
+      document.getElementById('e-num').value = m.num || '';
+      document.getElementById('e-preds').innerHTML = PLAYERS.map(p =>
+        `<div class="modal-pred-item"><label style="color:${p.color}">${p.name.split(' ')[0]}'s pick</label>
+     <input type="text" id="ep-${p.id}" value="${m.preds?.[p.id] || ''}"/></div>`).join('');
+      const ew = document.getElementById('e-winner');
+      ew.innerHTML = `<option value="">— Not decided —</option><option>${m.team1}</option><option>${m.team2}</option>`;
+      ew.value = m.winner || '';
+      document.getElementById('edit-modal').classList.add('open');
+    };
+    window.closeEdit = () => { editingId = null; document.getElementById('edit-modal').classList.remove('open'); };
+    window.closeEditOutside = e => { if (e.target === document.getElementById('edit-modal')) window.closeEdit(); };
+    window.saveEdit = async () => {
+      if (!isAdmin || !editingId) return;
+      const t1 = document.getElementById('e-t1').value.trim();
+      const t2 = document.getElementById('e-t2').value.trim();
+      if (!t1 || !t2) { showToast('Both team names required'); return; }
+      const preds = {};
+      PLAYERS.forEach(p => { preds[p.id] = document.getElementById('ep-' + p.id).value.trim(); });
+      await update(ref(db, `matches/${editingId}`), {
+        team1: t1, team2: t2,
+        date: document.getElementById('e-date').value,
+        num: document.getElementById('e-num').value,
+        preds, winner: document.getElementById('e-winner').value
+      });
+      window.closeEdit();
+      showToast('Match updated! ✅');
+    };
+
+    // ── POINTS ──
+    function getPoints() {
+      const pts = {};
+      PLAYERS.forEach(p => pts[p.id] = 0);
+      matches.forEach(m => {
+        if (!m.winner) return;
+        PLAYERS.forEach(p => { if (m.preds?.[p.id] === m.winner) pts[p.id] += 2; });
+      });
+      return pts;
+    }
+
+    // ── RENDER ──
+    function renderScoreboard() {
+      const pts = getPoints();
+      const sorted = [...PLAYERS].sort((a, b) => pts[b.id] - pts[a.id]);
+      const rankColors = ['#FFD700', '#C0C0C0', '#CD7F32', '#888'];
+      document.getElementById('scoreboard').innerHTML = sorted.map((p, i) => {
+        const isLeader = i === 0 && pts[p.id] > 0;
+        return `<div class="score-card ${isLeader ? 'leader' : ''}">
+      <div class="sc-avatar" style="background:${p.bg};color:${p.color}">${p.short}</div>
+      <div class="sc-name">${p.name.split(' ')[0]}</div>
+      <div class="sc-pts" style="color:${isLeader ? 'var(--orange)' : rankColors[i]}">${pts[p.id]}<small> pts</small></div>
+      ${isLeader ? '<div class="sc-label">Leader 🏆</div>' : ''}
+    </div>`;
+      }).join('');
+    }
+
+    function renderMatches() {
+      const el = document.getElementById('matches-list');
+      if (!matches.length) { el.innerHTML = '<div class="no-matches">No matches logged yet.</div>'; return; }
+      el.innerHTML = matches.map(m => {
+        const predsHtml = PLAYERS.map(p => {
+          const pred = m.preds?.[p.id] || '—';
+          const correct = m.winner && pred === m.winner;
+          const wrong = m.winner && pred && pred !== m.winner;
+          return `<div class="pred-badge ${correct ? 'correct' : wrong ? 'wrong' : ''}">
+        <div class="pb-name" style="color:${p.color}">${p.name.split(' ')[0]}</div>
+        <div class="pb-team">${pred}</div>
+        <div class="pb-pts">${correct ? '+2 pts' : wrong ? '0 pts' : ''}</div>
+      </div>`;
+        }).join('');
+
+        const winnerEl = m.winner
+          ? `<div class="winner-badge"><span>🏆</span><span class="winner-label">Winner:</span><span>${m.winner}</span></div>`
+          : isAdmin
+            ? `<div class="winner-row"><span style="font-size:11px;color:var(--txt2);white-space:nowrap">Set winner:</span>
+            <select class="pending-select" onchange="setWinner('${m.id}',this.value)">
+              <option value="">— Pending —</option>
+              <option>${m.team1}</option><option>${m.team2}</option>
+            </select></div>`
+            : `<div style="font-size:12px;color:var(--txt2);padding:4px 0">⏳ Match result pending</div>`;
+
+        const actionsHtml = isAdmin
+          ? `<div class="match-actions">
+          <button class="btn-act edit" onclick="openEdit('${m.id}')">✏ Edit</button>
+          <button class="btn-act del" onclick="deleteMatch('${m.id}')">✕ Delete</button>
+        </div>` : '';
+
+        return `<div class="match-card">
+      <div class="match-header">
+        <div>
+          <div class="match-teams">${m.team1} vs ${m.team2}</div>
+          <div class="match-meta">${m.num || ''}${m.num && m.date ? ' · ' : ''}${m.date || ''}</div>
+        </div>
+        ${actionsHtml}
+      </div>
+      <div class="preds-row">${predsHtml}</div>
+      ${winnerEl}
+    </div>`;
+      }).join('');
+    }
+
+    function renderAll() { renderScoreboard(); renderMatches(); }
+
+    // ── TABS ──
+    let currentTab = 'matches';
+    window.switchTab = t => {
+      currentTab = t;
+      ['matches', 'add', 'export-text', 'export-img'].forEach(x => {
+        document.getElementById(`tab-${x}`).style.display = x === t ? 'block' : 'none';
+      });
+      document.querySelectorAll('.tab').forEach(el => {
+        el.classList.toggle('active', el.getAttribute('onclick') === `switchTab('${t}')`);
+      });
+      if (t === 'export-text') document.getElementById('export-preview').value = buildFull();
+    };
+
+    // ── EXPORT TEXT ──
+    function buildLB() {
+      const pts = getPoints(); const sorted = [...PLAYERS].sort((a, b) => pts[b.id] - pts[a.id]);
+      const medals = ['🥇', '🥈', '🥉', '  '];
+      let out = '🏏 IPL PREDICTION LEAGUE — LEADERBOARD\n' + '━'.repeat(38) + '\n';
+      sorted.forEach((p, i) => { out += `${medals[i]} ${p.name.padEnd(14)} ${String(pts[p.id]).padStart(3)} pts  ${'█'.repeat(Math.max(0, pts[p.id]))}\n`; });
+      return out + '━'.repeat(38) + '\nTotal: ' + matches.length + ' matches | Decided: ' + matches.filter(m => m.winner).length;
+    }
+    function buildTable() {
+      let out = '🏏 IPL PREDICTION LEAGUE — MATCH TABLE\n' + '━'.repeat(70) + '\n';
+      const hdr = ['Match', 'Winner', ...PLAYERS.map(p => p.name.split(' ')[0]), 'Scorers'].map((h, i) => i === 0 ? h.padEnd(20) : i === 1 ? h.padEnd(8) : h.padEnd(10));
+      out += hdr.join('') + '\n' + '─'.repeat(70) + '\n';
+      if (!matches.length) return out + 'No matches.\n';
+      [...matches].reverse().forEach(m => {
+        const preds = PLAYERS.map(p => { const pred = m.preds?.[p.id] || '—'; const mark = m.winner ? (pred === m.winner ? '✓' : '✗') : '?'; return (pred + mark).padEnd(10); });
+        const correct = m.winner ? PLAYERS.filter(p => m.preds?.[p.id] === m.winner).map(p => p.name.split(' ')[0]).join(',') || 'None' : '—';
+        out += [`${m.team1} vs ${m.team2}`.slice(0, 19).padEnd(20), (m.winner || 'Pending').padEnd(8), ...preds, correct].join('') + '\n';
+      });
+      return out + '━'.repeat(70) + '\n✓=correct(+2) ✗=wrong ?=pending';
+    }
+    function buildFull() {
+      const pts = getPoints(); const sorted = [...PLAYERS].sort((a, b) => pts[b.id] - pts[a.id]);
+      let out = '╔══════════════════════════════════════╗\n║   🏏  IPL PREDICTION LEAGUE REPORT   ║\n╚══════════════════════════════════════╝\n\n';
+      out += buildLB() + '\n\nPLAYER STATS\n' + '─'.repeat(38) + '\n';
+      sorted.forEach(p => {
+        const d = matches.filter(m => m.winner); const c = d.filter(m => m.preds?.[p.id] === m.winner).length;
+        out += `${p.name.padEnd(14)} ${c}/${d.length} correct  ${d.length ? Math.round(c / d.length * 100) : 0}%  ${pts[p.id]} pts\n`;
+      });
+      return out + '\n' + buildTable() + '\n\nGenerated: ' + new Date().toLocaleString();
+    }
+    function buildCSVText() {
+      let out = 'Match,Date,Team1,Team2,' + PLAYERS.map(p => p.name).join(',') + ',Winner,' + PLAYERS.map(p => p.name + ' Result').join(',') + '\n';
+      [...matches].reverse().forEach((m, i) => {
+        const preds = PLAYERS.map(p => m.preds?.[p.id] || '').join(',');
+        const res = PLAYERS.map(p => !m.winner ? 'pending' : m.preds?.[p.id] === m.winner ? 'correct (+2)' : 'wrong (0)').join(',');
+        out += `${m.num || 'Match ' + (i + 1)},${m.date || ''},${m.team1},${m.team2},${preds},${m.winner || 'pending'},${res}\n`;
+      });
+      return out;
+    }
+    function copyTxt(txt, btn) {
+      navigator.clipboard.writeText(txt).then(() => {
+        if (btn) { const o = btn.innerHTML; btn.classList.add('ok'); btn.innerHTML = '✓ Copied!'; setTimeout(() => { btn.classList.remove('ok'); btn.innerHTML = o; }, 2000); }
+        showToast('Copied!');
+      });
+    }
+    window.copyLB = b => { const t = buildLB(); document.getElementById('export-preview').value = t; copyTxt(t, b); };
+    window.copyTable = b => { const t = buildTable(); document.getElementById('export-preview').value = t; copyTxt(t, b); };
+    window.copyFull = b => { const t = buildFull(); document.getElementById('export-preview').value = t; copyTxt(t, b); };
+    window.copyCSV = b => { const t = buildCSVText(); document.getElementById('export-preview').value = t; copyTxt(t, b); };
+    window.copyPreview = b => copyTxt(document.getElementById('export-preview').value, b);
+
+    // ── EXPORT IMAGE ──
+    function buildImgHTML(type) {
+      const pts = getPoints(); const sorted = [...PLAYERS].sort((a, b) => pts[b.id] - pts[a.id]);
+      const medals = ['🥇', '🥈', '🥉', '4️⃣']; const maxPts = Math.max(...Object.values(pts), 1);
+      let html = `<div style="font-family:sans-serif;background:#0f1117;color:#fff;padding:32px;min-width:680px">`;
+      html += `<div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;border-bottom:1px solid #ffffff20;padding-bottom:20px">
+    <span style="font-size:36px">🏏</span>
+    <div><div style="font-size:28px;font-weight:700;letter-spacing:2px;color:#FF6B00;line-height:1">IPL PREDICTION LEAGUE</div>
+    <div style="font-size:12px;color:#999;margin-top:4px">Sai Pavan · Karthik · Charan · Vaibhav · ${matches.length} matches</div></div>
+    <div style="margin-left:auto;font-size:12px;color:#555">${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+  </div>`;
+      if (type === 'leaderboard' || type === 'full') {
+        html += `<div style="margin-bottom:24px"><div style="font-size:10px;letter-spacing:2px;color:#FF6B00;margin-bottom:12px;font-weight:600">LEADERBOARD</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">`;
+        sorted.forEach((p, i) => {
+          const pct = Math.round(pts[p.id] / maxPts * 100);
+          html += `<div style="background:${i === 0 ? '#FF6B0015' : '#ffffff08'};border:1px solid ${i === 0 ? '#FF6B0060' : '#ffffff15'};border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:22px;margin-bottom:6px">${medals[i]}</div>
+        <div style="font-size:11px;color:#aaa;margin-bottom:6px;font-weight:600">${p.name.split(' ')[0].toUpperCase()}</div>
+        <div style="font-size:40px;font-weight:700;line-height:1;color:${i === 0 ? '#FF6B00' : '#fff'}">${pts[p.id]}</div>
+        <div style="font-size:10px;color:#555;margin-bottom:10px">points</div>
+        <div style="height:4px;background:#ffffff10;border-radius:2px"><div style="height:100%;width:${pct}%;background:${i === 0 ? '#FF6B00' : '#ffffff40'};border-radius:2px"></div></div>
+      </div>`;
+        });
+        html += `</div></div>`;
+      }
+      if (type === 'table' || type === 'full') {
+        html += `<div><div style="font-size:10px;letter-spacing:2px;color:#FF6B00;margin-bottom:12px;font-weight:600">MATCH RESULTS</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="border-bottom:1px solid #ffffff20">
+      <th style="text-align:left;padding:8px 10px;color:#888;font-size:10px;letter-spacing:1px">MATCH</th>
+      <th style="padding:8px 8px;color:#888;font-size:10px;text-align:center">WINNER</th>`;
+        PLAYERS.forEach(p => { html += `<th style="padding:8px 6px;color:${p.color};font-size:10px;text-align:center;font-weight:600">${p.name.split(' ')[0].toUpperCase()}</th>`; });
+        html += `</tr></thead><tbody>`;
+        [...matches].reverse().forEach((m, i) => {
+          html += `<tr style="border-bottom:1px solid #ffffff08;background:${i % 2 === 0 ? '#ffffff05' : 'transparent'}">
+        <td style="padding:9px 10px;color:#ddd;font-size:12px;font-weight:500">${m.team1} vs ${m.team2}${m.date ? '<br><span style="font-size:10px;color:#555">' + m.date + '</span>' : ''}</td>
+        <td style="padding:9px 8px;text-align:center">${m.winner ? `<span style="background:#FFD70020;color:#FFD700;border:1px solid #FFD70040;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600">🏆 ${m.winner}</span>` : `<span style="color:#555;font-size:11px">Pending</span>`}</td>`;
+          PLAYERS.forEach(p => {
+            const pred = m.preds?.[p.id] || '—'; const correct = m.winner && pred === m.winner; const wrong = m.winner && pred && pred !== m.winner;
+            html += `<td style="padding:9px 6px;text-align:center"><div style="display:inline-block;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${correct ? '#00C85320' : wrong ? '#e24b4a15' : '#ffffff08'};color:${correct ? '#00C853' : wrong ? '#e24b4a' : '#888'};border:1px solid ${correct ? '#00C85340' : wrong ? '#e24b4a30' : '#ffffff10'}">${pred}${correct ? ' ✓' : wrong ? ' ✗' : ''}</div></td>`;
+          });
+          html += `</tr>`;
+        });
+        html += `</tbody></table></div>`;
+        html += `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid #ffffff10">`;
+        sorted.forEach(p => {
+          const d = matches.filter(m => m.winner); const c = d.filter(m => m.preds?.[p.id] === m.winner).length;
+          html += `<div style="text-align:center;background:#ffffff08;border-radius:8px;padding:10px"><div style="font-size:10px;color:#555;margin-bottom:2px">${p.name.split(' ')[0]}</div><div style="font-size:20px;font-weight:700;color:${p.color}">${pts[p.id]} pts</div><div style="font-size:10px;color:#555">${d.length ? Math.round(c / d.length * 100) : 0}% accuracy</div></div>`;
+        });
+        html += `</div>`;
+      }
+      html += `<div style="margin-top:20px;padding-top:16px;border-top:1px solid #ffffff10;font-size:10px;color:#333;text-align:center;letter-spacing:1px">IPL PREDICTION LEAGUE · ${new Date().toLocaleString()}</div></div>`;
+      return html;
+    }
+
+    window.renderImg = (type, btn) => {
+      const loading = document.getElementById('img-loading'), wrap = document.getElementById('img-preview-wrap');
+      loading.style.display = 'block'; wrap.style.display = 'none';
+      if (btn) { const o = btn.innerHTML; btn.disabled = true; btn.innerHTML = 'Generating...'; setTimeout(() => { btn.disabled = false; btn.innerHTML = o; }, 6000); }
+      const container = document.createElement('div');
+      container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1';
+      container.innerHTML = buildImgHTML(type);
+      document.body.appendChild(container);
+      const el = container.firstElementChild;
+      setTimeout(() => {
+        html2canvas(el, { scale: 2, backgroundColor: '#0f1117', useCORS: true, logging: false, width: el.offsetWidth, height: el.offsetHeight }).then(canvas => {
+          const url = canvas.toDataURL('image/png');
+          document.getElementById('img-preview').src = url;
+          const dl = document.getElementById('dl-link'); dl.href = url; dl.download = `ipl-${type}-${new Date().toISOString().split('T')[0]}.png`;
+          loading.style.display = 'none'; wrap.style.display = 'block';
+          document.body.removeChild(container); showToast('Image ready!');
+        }).catch(() => { loading.style.display = 'none'; document.body.removeChild(container); showToast('Failed, try again.'); });
+      }, 150);
+    };
+
+    // ── TOAST ──
+    window.showToast = msg => {
+      const t = document.getElementById('toast'); t.textContent = msg;
+      t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200);
+    };
+  </script>
+</body>
+
+</html>
