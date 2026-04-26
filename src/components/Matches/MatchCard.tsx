@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { PLAYERS } from '../../lib/firebase';
 
 // ✅ Updated logos (your links)
