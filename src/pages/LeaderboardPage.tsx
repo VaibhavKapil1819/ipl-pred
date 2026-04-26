@@ -10,192 +10,259 @@ import { PLAYERS } from '../lib/firebase';
 
 const LeaderboardPage: React.FC = () => {
   const [matches, setMatches] = useState<any[]>([]);
-  const [playerStats, setPlayerStats] = useState<{ [key: string]: any }>({});
-  const [loading, setLoading] = useState(true);
-  const [feedFilters, setFeedFilters] = useState({ team: '', player: '', status: 'completed' });
+  const [playerStats, setPlayerStats] = useState<any>({});
+  const [feedFilters, setFeedFilters] = useState({
+    team: '',
+    player: '',
+    status: 'completed'
+  });
 
   useEffect(() => {
     const unsub = onValue(ref(db, 'matches'), (snap) => {
       const data = snap.val() || {};
-      const matchList = Object.entries(data)
-        .map(([id, m]: [string, any]) => ({ ...m, id }))
+
+      // ✅ IMPORTANT: keep ASC for stats
+      const list = Object.entries(data)
+        .map(([id, m]: any) => ({ ...m, id }))
         .sort((a, b) => (a.ts || 0) - (b.ts || 0));
 
-      setMatches(matchList);
-      setPlayerStats(calculateStats(matchList));
-      setLoading(false);
+      setMatches(list);
+      setPlayerStats(calculateStats(list));
     });
 
     return () => unsub();
   }, []);
 
-  if (loading) return <div className="no-matches">Loading leaderboard...</div>;
+  // ✅ leaderboard sorting
+  const sorted = [...PLAYERS].sort(
+    (a, b) =>
+      (playerStats[b.id]?.points || 0) -
+      (playerStats[a.id]?.points || 0)
+  );
 
-  const sortedPlayers = [...PLAYERS].sort((a, b) => (playerStats[b.id]?.points || 0) - (playerStats[a.id]?.points || 0));
+  // 🔥 MAIN FIX: latest first for feed
+  const filteredFeed = [...matches]
+    .sort((a, b) => (b.ts || 0) - (a.ts || 0))
+    .filter((m: any) => {
+      const isCompleted = !!m.winner;
 
-  // Filter Prediction Feed
-  const filteredFeed = matches.filter((m: any) => {
-    // Status Filter
-    const isCompleted = !!m.winner;
-    if (feedFilters.status === 'upcoming' && isCompleted) return false;
-    if (feedFilters.status === 'completed' && !isCompleted) return false;
+      if (feedFilters.status === 'upcoming' && isCompleted) return false;
+      if (feedFilters.status === 'completed' && !isCompleted) return false;
 
-    // Team Filter
-    if (feedFilters.team && m.team1 !== feedFilters.team && m.team2 !== feedFilters.team) return false;
+      if (
+        feedFilters.team &&
+        m.team1 !== feedFilters.team &&
+        m.team2 !== feedFilters.team
+      ) return false;
 
-    // Player Filter
-    if (feedFilters.player) {
-      const hasPred = m.preds && m.preds[feedFilters.player];
-      if (!hasPred) return false;
-    }
+      if (
+        feedFilters.player &&
+        !(m.preds && m.preds[feedFilters.player])
+      ) return false;
 
-    return true;
-  });
+      return true;
+    });
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Trophy color="var(--orange)" size={24} />
-          <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '28px', letterSpacing: '2px' }}>Championship Standings</h2>
+    <div className="page">
+
+      {/* CSS */}
+      <style>{`
+        .page {
+          max-width: 1100px;
+          margin: auto;
+          padding: 12px;
+        }
+
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+        }
+
+        .table {
+          border-radius: 12px;
+          overflow: hidden;
+          border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .row {
+          display: grid;
+          grid-template-columns: 40px 1.5fr 100px 80px 100px 160px 100px;
+          align-items: center;
+          padding: 12px;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          background: #0f172a;
+        }
+
+        .header-row {
+          background: #020617;
+          font-size: 11px;
+          color: #94a3b8;
+          font-weight: 600;
+        }
+
+        .data-row:hover {
+          background: #1e293b;
+        }
+
+        .name-cell {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 600;
+        }
+
+        .avatar {
+          width: 28px;
+          height: 28px;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          font-weight: bold;
+        }
+
+        .form {
+          display: flex;
+          gap: 6px;
+        }
+
+        .form-circle {
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: bold;
+        }
+
+        .win {
+          background: #22c55e;
+          color: white;
+        }
+
+        .loss {
+          background: #ef4444;
+          color: white;
+        }
+
+        .latest {
+          box-shadow: 0 0 0 2px white, 0 0 8px currentColor;
+        }
+
+        .points {
+          font-weight: bold;
+          font-size: 14px;
+        }
+
+        @media(max-width: 800px){
+          .row {
+            grid-template-columns: 30px 1fr 70px 60px 70px 140px 70px;
+            font-size: 11px;
+          }
+
+          .form-circle {
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+          }
+        }
+      `}</style>
+
+      {/* HEADER */}
+      <div className="header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Trophy size={20} />
+          <h2>Standings</h2>
         </div>
-        <ExportTools points={Object.fromEntries(Object.entries(playerStats).map(([id, s]) => [id, s.points]))} />
+
+        <ExportTools
+          points={Object.fromEntries(
+            Object.entries(playerStats).map(([id, s]) => [id, s.points])
+          )}
+        />
       </div>
 
-      <div id="leaderboard-section">
-        <div className="scoreboard">
-          {sortedPlayers.map((p, i) => {
-            const s = playerStats[p.id] || {};
-            const isLeader = i === 0 && s.points > 0;
-            const rankColors = ['#FFD700', '#C0C0C0', '#CD7F32', 'var(--txt2)'];
-            
-            return (
-              <div key={p.id} className={`score-card ${isLeader ? 'leader' : ''}`}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-                  <div className="sc-main">
-                    <div className="rank-badge">{i + 1}</div>
-                    <div className="sc-avatar" style={{ background: p.bg, color: p.color }}>{p.short}</div>
-                    <div className="sc-name">{p.name}</div>
-                  </div>
-                  
-                  <div className="stats-grid">
-                    <div className="stat-item">
-                      <span className="stat-lbl">Record</span>
-                      <span className="stat-val">{s.right}-{s.wrong}</span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-lbl">Streak</span>
-                      <span className="stat-val" style={{ color: s.currentStreak > 1 ? 'var(--green)' : s.currentLosingStreak > 1 ? 'var(--red)' : 'inherit' }}>
-                        {s.currentStreak > 0 ? `${s.currentStreak}W` : s.currentLosingStreak > 0 ? `${s.currentLosingStreak}L` : '—'}
-                      </span>
-                    </div>
-                    <div className="stat-item">
-                      <span className="stat-lbl">Best</span>
-                      <span className="stat-val" style={{ color: 'var(--green)' }}>{s.bestStreak}W</span>
-                    </div>
-                  </div>
-                </div>
+      {/* TABLE */}
+      <div className="table">
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                  <div className="form-pips">
-                    {s.form?.map((result: string, idx: number) => (
-                      <div key={idx} className={`pip ${result}`} title={result} />
-                    ))}
-                  </div>
-                  
-                  <div className="sc-pts" style={{ color: i < 3 ? rankColors[i] : 'inherit' }}>
-                    {s.points}<small style={{ fontSize: '12px', marginLeft: '4px' }}>pts</small>
-                  </div>
+        <div className="row header-row">
+          <div>#</div>
+          <div>Player</div>
+          <div>W-L</div>
+          <div>Total</div>
+          <div>Accuracy</div>
+          <div>Form</div>
+          <div>Points</div>
+        </div>
+
+        {sorted.map((p, i) => {
+          const s = playerStats[p.id] || {};
+          const last5 = s.form?.slice(-5) || [];
+
+          return (
+            <div key={p.id} className="row data-row">
+              
+              <div>{i + 1}</div>
+
+              <div className="name-cell">
+                <div className="avatar" style={{ background: p.bg, color: p.color }}>
+                  {p.short}
                 </div>
+                {p.name}
               </div>
-            );
-          })}
-        </div>
 
-        <div className="section-title">League Performance Detail</div>
-        <div className="perf-table-container">
-          <table className="perf-table">
-            <thead>
-              <tr>
-                <th>Player</th>
-                <th>Accuracy</th>
-                <th>Hot/Cold Streak</th>
-                <th>Record (W-L)</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedPlayers.map(p => {
-                const s = playerStats[p.id] || {};
-                const isHot = s.currentStreak >= 2;
-                const isCold = s.currentLosingStreak >= 2;
-                
-                return (
-                   <tr key={p.id}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: p.color, boxShadow: `0 0 10px ${p.color}` }}></div>
-                        <span style={{ fontWeight: 600 }}>{p.name}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--green)' }}>{s.accuracy}%</span>
-                        <div className="progress-container">
-                          <div className="progress-bar" style={{ width: `${s.accuracy}%` }}></div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      {isHot ? (
-                        <div className="streak-pill hot">🔥 {s.currentStreak}W STREAK</div>
-                      ) : isCold ? (
-                        <div className="streak-pill cold">❄️ {s.currentLosingStreak}L STREAK</div>
-                      ) : (
-                        <span style={{ color: 'var(--txt2)', fontSize: '11px' }}>Steady</span>
-                      )}
-                    </td>
-                    <td style={{ fontWeight: 600 }}>
-                      <span style={{ color: 'var(--green)' }}>{s.right}</span>
-                      <span style={{ margin: '0 4px', color: 'var(--txt2)' }}>-</span>
-                      <span style={{ color: 'var(--red)' }}>{s.wrong}</span>
-                    </td>
-                    <td style={{ color: 'var(--txt2)', fontWeight: 500 }}>{s.total}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+              <div>{s.right}-{s.wrong}</div>
+              <div>{s.total}</div>
+              <div>{s.accuracy}%</div>
 
-        <div style={{ marginTop: '40px', borderTop: '2px dashed var(--bdr)', paddingTop: '30px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px', paddingLeft: '10px' }}>
-            <Calendar color="var(--orange)" size={20} />
-            <h3 style={{ fontFamily: 'Bebas Neue', fontSize: '22px', letterSpacing: '1px', margin: 0 }}>Prediction Feed</h3>
-          </div>
-          
-          <FilterBar onFilterChange={setFeedFilters} activeFilters={feedFilters} />
+              <div className="form">
+                {last5.map((r: string, idx: number) => {
+                  const isLast = idx === last5.length - 1;
 
-          <div className="matches-list">
-            {filteredFeed.length === 0 ? (
-              <div className="no-matches" style={{ padding: '30px', opacity: 0.5 }}>No matches match these filters.</div>
-            ) : (
-              filteredFeed.map((m: any) => (
-                <MatchCard key={m.id} match={m} />
-              ))
-            )}
-          </div>
-        </div>
+                  return (
+                    <div
+                      key={idx}
+                      className={`form-circle ${r === 'W' ? 'win' : 'loss'} ${isLast ? 'latest' : ''}`}
+                    >
+                      {r === 'W' ? '✓' : '✕'}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="points">{s.points}</div>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="section-title" style={{ marginTop: '30px' }}>Rules of Play</div>
-      <div className="form-card" style={{ fontSize: '13px', color: 'var(--txt2)', lineHeight: '1.6' }}>
-        <ul style={{ paddingLeft: '20px' }}>
-          <li><strong>Points:</strong> +2 for every correct winner prediction.</li>
-          <li><strong>Streaks:</strong> Correct picks build Win Streaks (W). Wrong picks build Losing Streaks (L).</li>
-          <li><strong>Accuracy:</strong> Calculated based on matches you actually predicted.</li>
-        </ul>
+      {/* FEED */}
+      <div style={{ marginTop: '25px' }}>
+        <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+          <Calendar size={16} />
+          <h3>Prediction Feed</h3>
+        </div>
+
+        <FilterBar
+          onFilterChange={setFeedFilters}
+          activeFilters={feedFilters}
+        />
+
+        {filteredFeed.map((m: any, idx: number) => (
+          <MatchCard
+            key={m.id}
+            match={m}
+            isLatest={idx === 0} // 🔥 optional highlight
+          />
+        ))}
       </div>
+
     </div>
   );
 };

@@ -1,156 +1,191 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { db, PLAYERS } from '../../lib/firebase';
-import { ref, update } from 'firebase/database';
-import { Timer, Settings } from 'lucide-react';
-import PredictionSlip from './PredictionSlip';
-import AdminEditModal from './AdminEditModal';
-import TeamLogo from '../Shared/TeamLogo';
+import React from 'react';
+import { PLAYERS } from '../../lib/firebase';
 
-interface MatchCardProps {
-  match: {
-    id: string;
-    team1: string;
-    team2: string;
-    date: string;
-    cutoffTime?: string;
-    winner?: string;
-    preds?: { [key: string]: any };
-    mvp?: string;
+// ✅ Updated logos (your links)
+const TEAM_LOGOS: any = {
+  CSK: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/2b/Chennai_Super_Kings_Logo.svg/500px-Chennai_Super_Kings_Logo.svg.png',
+  MI: 'https://upload.wikimedia.org/wikipedia/en/c/cd/Mumbai_Indians_Logo.svg',
+  RCB: 'https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/Royal_Challengers_Bengaluru_Logo.svg/330px-Royal_Challengers_Bengaluru_Logo.svg.png',
+  SRH: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/51/Sunrisers_Hyderabad_Logo.svg/500px-Sunrisers_Hyderabad_Logo.svg.png',
+  RR: 'https://static.vecteezy.com/system/resources/previews/075/244/952/non_2x/rajasthan-royals-logo-rr-logo-icon-on-transparent-background-free-png.png',
+  KKR: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Kolkata_Knight_Riders_Logo.svg/500px-Kolkata_Knight_Riders_Logo.svg.png',
+  DC: 'https://upload.wikimedia.org/wikipedia/en/2/2f/Delhi_Capitals.svg',
+  PBKS: 'https://upload.wikimedia.org/wikipedia/en/d/d4/Punjab_Kings_Logo.svg',
+  LSG: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/34/Lucknow_Super_Giants_Logo.svg/500px-Lucknow_Super_Giants_Logo.svg.png',
+  GT: 'https://upload.wikimedia.org/wikipedia/en/0/09/Gujarat_Titans_Logo.svg',
+};
+
+const MatchCard = ({ match, isLatest }: any) => {
+
+  const getPick = (pred: any) => {
+    if (!pred) return null;
+    return typeof pred === 'object' ? pred.pick : pred;
   };
-  playerStats?: { [key: string]: any };
-}
 
-const MatchCard: React.FC<MatchCardProps> = ({ match, playerStats }) => {
-  const { isAdmin, userPlayerId } = useAuth();
-  const [showEditModal, setShowEditModal] = useState(false);
-  
-  const isLocked = match.cutoffTime ? new Date() > new Date(match.cutoffTime) : false;
-  const isDecided = !!match.winner;
-
-  const handleSetWinner = async (val: string) => {
-    if (!isAdmin) return;
-    await update(ref(db, `matches/${match.id}`), { winner: val });
+  const getResult = (pick: string | null) => {
+    if (!pick || !match.winner) return null;
+    return pick.toLowerCase() === match.winner.toLowerCase()
+      ? 'win'
+      : 'loss';
   };
 
   return (
-    <div className="match-card">
-      <div className="match-header">
-        <div style={{ flex: 1 }}>
-          <div className="match-teams" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <TeamLogo team={match.team1} size={28} />
-              <span>{match.team1}</span>
-            </div>
-            <span style={{ fontSize: '14px', color: 'var(--txt2)' }}>vs</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <TeamLogo team={match.team2} size={28} />
-              <span>{match.team2}</span>
-            </div>
-          </div>
-          <div className="match-meta">
-            {match.date}
-          </div>
+    <div
+      style={{
+        background: '#0f172a',
+        borderRadius: '18px',
+        padding: '18px',
+        marginBottom: '18px',
+        border: isLatest
+          ? '1.5px solid #22c55e'
+          : '1px solid rgba(255,255,255,0.05)',
+      }}
+    >
+
+      {/* 🔝 HEADER */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '14px'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src={TEAM_LOGOS[match.team1]} style={{ width: 34 }} />
+          <b>{match.team1}</b>
         </div>
-        
-        <div className="match-actions" style={{ gap: '8px', alignSelf: 'flex-start' }}>
-          {isAdmin && (
-            <button 
-              className="btn-act edit" 
-              onClick={() => setShowEditModal(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--yellow)', background: 'rgba(250, 204, 21, 0.1)', padding: '6px 10px', borderRadius: '8px', border: '1px solid rgba(250, 204, 21, 0.2)', fontSize: '11px', fontWeight: 600 }}
-            >
-              <Settings size={12} />
-              Edit Match
-            </button>
-          )}
+
+        <div style={{ opacity: 0.6, fontSize: '13px' }}>VS</div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <b>{match.team2}</b>
+          <img src={TEAM_LOGOS[match.team2]} style={{ width: 34 }} />
         </div>
       </div>
 
-      <div className="preds-row">
-        {PLAYERS.map(p => {
-          const rawPred = match.preds?.[p.id];
-          const s = playerStats?.[p.id] || {};
-          
-          let pick = '—';
-          if (rawPred) {
-            pick = typeof rawPred === 'object' ? rawPred.pick || '—' : rawPred;
-          }
+      {/* DATE */}
+      <div style={{ fontSize: '12px', opacity: 0.7, marginBottom: '14px' }}>
+        {match.date}
+      </div>
 
-          const correct = isDecided && pick === match.winner;
-          const wrong = isDecided && pick !== '—' && pick !== match.winner;
-          const pts = correct ? 2 : 0;
+      {/* 👥 PLAYER CARDS */}
+      <div style={{ display: 'flex', gap: '14px' }}>
+        {PLAYERS.map((p: any) => {
+          const rawPred = match.preds?.[p.id];
+          const pick = getPick(rawPred);
+          const teamKey = pick ? pick.toUpperCase().trim() : null;
+          const result = getResult(pick);
 
           return (
-            <div key={p.id} className={`pred-badge ${correct ? 'correct' : wrong ? 'wrong' : ''}`}>
-              <div className="pb-name" style={{ color: p.color, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>{p.name.split(' ')[0]}</span>
-                <div className="form-pips" style={{ gap: '2px', display: 'flex' }}>
-                  {s.form?.slice(-3).map((result: string, idx: number) => (
-                    <div key={idx} className={`pip ${result}`} style={{ width: '4px', height: '4px' }} />
-                  ))}
-                </div>
+            <div
+              key={p.id}
+              style={{
+                flex: 1,
+                borderRadius: '14px',
+                padding: '14px',
+                minHeight: '120px',
+                textAlign: 'center',
+                border:
+                  result === 'win'
+                    ? '1.5px solid #22c55e'
+                    : result === 'loss'
+                    ? '1.5px solid #ef4444'
+                    : '1px solid rgba(255,255,255,0.1)',
+                background:
+                  result === 'win'
+                    ? 'rgba(34,197,94,0.12)'
+                    : 'rgba(255,255,255,0.02)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                gap: '6px'
+              }}
+            >
+
+              {/* PLAYER */}
+              <div style={{ fontSize: '11px', color: p.color }}>
+                {p.short}
               </div>
-              <div className="pb-content">
-                <div className="pb-team">
-                  {pick}
-                </div>
-                <div className="pb-pts">
-                  {correct ? `+${pts} pts` : wrong ? '0 pts' : ''}
-                </div>
+
+              {/* LOGO */}
+              {teamKey && TEAM_LOGOS[teamKey] ? (
+                <img
+                  src={TEAM_LOGOS[teamKey]}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    margin: 'auto',
+                    objectFit: 'contain'
+                  }}
+                  onError={(e) => (e.currentTarget.style.display = 'none')}
+                />
+              ) : (
+                <div style={{ opacity: 0.4 }}>—</div>
+              )}
+
+              {/* TEAM */}
+              <div style={{ fontSize: '12px' }}>
+                {teamKey || '-'}
               </div>
+
+              {/* POINTS */}
+              <div
+                style={{
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color:
+                    result === 'win'
+                      ? '#22c55e'
+                      : result === 'loss'
+                      ? '#ef4444'
+                      : '#94a3b8'
+                }}
+              >
+                {result === 'win'
+                  ? '+2 pts'
+                  : result === 'loss'
+                  ? '0 pts'
+                  : ''}
+              </div>
+
             </div>
           );
         })}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '10px', paddingTop: '10px', borderTop: '1px solid var(--bdr)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {isDecided ? (
-            <div className="winner-badge">
-              <span>🏆</span>
-              <span className="winner-label">Winner:</span>
-              <span>{match.winner}</span>
-            </div>
-          ) : (
-            isAdmin ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '11px', color: 'var(--txt2)' }}>Set winner:</span>
-                <select 
-                  className="pending-select" 
-                  onChange={(e) => handleSetWinner(e.target.value)}
-                  defaultValue=""
-                >
-                  <option value="">— Pending —</option>
-                  <option value={match.team1}>{match.team1}</option>
-                  <option value={match.team2}>{match.team2}</option>
-                </select>
-              </div>
-            ) : (
-              <div style={{ fontSize: '12px', color: 'var(--txt2)' }}>⏳ Match result pending</div>
-            )
-          )}
-          
-          {userPlayerId && !isLocked && !isDecided && (
-            <PredictionSlip key={match.id} match={match} />
-          )}
+      {/* 🏆 WINNER */}
+      {match.winner && (
+        <div
+          style={{
+            marginTop: '16px',
+            padding: '10px',
+            borderRadius: '10px',
+            background: 'rgba(255,255,255,0.03)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          🏆 <b>Winner:</b> {match.winner}
         </div>
+      )}
 
-        <div style={{ textAlign: 'right' }}>
-          {match.cutoffTime && (
-            <div className="deadline-badge" style={{ padding: '6px 12px', borderRadius: '10px', background: isLocked ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255, 107, 0, 0.1)', color: isLocked ? 'var(--red)' : 'var(--orange)', border: `1px solid ${isLocked ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 107, 0, 0.2)'}` }}>
-              <Timer size={12} style={{ marginRight: '6px' }} />
-              <span style={{ fontSize: '11px', fontWeight: 700 }}>
-                {isLocked ? 'LOCKS CLOSED' : `LOCKS: ${new Date(match.cutoffTime).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`}
-              </span>
-            </div>
-          )}
-        </div>
+      {/* 🔒 STATUS */}
+      <div style={{ marginTop: '12px', textAlign: 'right' }}>
+        <span
+          style={{
+            fontSize: '11px',
+            padding: '6px 10px',
+            borderRadius: '8px',
+            background: 'rgba(239,68,68,0.1)',
+            color: '#ef4444'
+          }}
+        >
+          LOCKS CLOSED
+        </span>
       </div>
 
-      {showEditModal && (
-        <AdminEditModal match={match} onClose={() => setShowEditModal(false)} />
-      )}
     </div>
   );
 };
