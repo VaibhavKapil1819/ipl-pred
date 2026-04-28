@@ -1,4 +1,3 @@
-import React from 'react';
 import { PLAYERS } from '../../lib/firebase';
 
 // ✅ Updated logos (your links)
@@ -90,8 +89,8 @@ const MatchCard = ({ match, isLatest }: any) => {
                   result === 'win'
                     ? '1.5px solid #22c55e'
                     : result === 'loss'
-                    ? '1.5px solid #ef4444'
-                    : '1px solid rgba(255,255,255,0.1)',
+                      ? '1.5px solid #ef4444'
+                      : '1px solid rgba(255,255,255,0.1)',
                 background:
                   result === 'win'
                     ? 'rgba(34,197,94,0.12)'
@@ -138,15 +137,15 @@ const MatchCard = ({ match, isLatest }: any) => {
                     result === 'win'
                       ? '#22c55e'
                       : result === 'loss'
-                      ? '#ef4444'
-                      : '#94a3b8'
+                        ? '#ef4444'
+                        : '#94a3b8'
                 }}
               >
                 {result === 'win'
                   ? '+2 pts'
                   : result === 'loss'
-                  ? '0 pts'
-                  : ''}
+                    ? '0 pts'
+                    : ''}
               </div>
 
             </div>
