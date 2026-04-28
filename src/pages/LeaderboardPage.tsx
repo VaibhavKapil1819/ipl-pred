@@ -183,7 +183,7 @@ const LeaderboardPage: React.FC = () => {
 
         <ExportTools
           points={Object.fromEntries(
-            Object.entries(playerStats).map(([id, s]: any) => [id, s.points])
+            Object.entries(playerStats).map(([id, s]) => [id, s.points])
           )}
         />
       </div>
