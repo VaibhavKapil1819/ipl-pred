@@ -1,37 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { db } from '../lib/firebase';
-import { ref, onValue } from 'firebase/database';
+import React, { useState } from 'react';
+import { useMatches } from '../context/MatchContext';
 import { Trophy, Calendar } from 'lucide-react';
 import ExportTools from '../components/Shared/ExportTools';
 import MatchCard from '../components/Matches/MatchCard';
 import FilterBar from '../components/Shared/FilterBar';
-import { calculateStats } from '../lib/stats';
 import { PLAYERS } from '../lib/firebase';
 
 const LeaderboardPage: React.FC = () => {
-  const [matches, setMatches] = useState<any[]>([]);
-  const [playerStats, setPlayerStats] = useState<any>({});
+  const { matches, playerStats, loading } = useMatches();
   const [feedFilters, setFeedFilters] = useState({
     team: '',
     player: '',
     status: 'completed'
   });
 
-  useEffect(() => {
-    const unsub = onValue(ref(db, 'matches'), (snap) => {
-      const data = snap.val() || {};
-
-      // ✅ IMPORTANT: keep ASC for stats
-      const list = Object.entries(data)
-        .map(([id, m]: any) => ({ ...m, id }))
-        .sort((a, b) => (a.ts || 0) - (b.ts || 0));
-
-      setMatches(list);
-      setPlayerStats(calculateStats(list));
-    });
-
-    return () => unsub();
-  }, []);
+  if (loading) return <div className="no-matches">Loading standings...</div>;
 
   // ✅ leaderboard sorting
   const sorted = [...PLAYERS].sort(

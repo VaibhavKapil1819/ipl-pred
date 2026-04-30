@@ -1,3 +1,7 @@
+import { useState } from 'react';
+import { Settings } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import AdminEditModal from './AdminEditModal';
 import { PLAYERS } from '../../lib/firebase';
 
 // ✅ Updated logos (your links)
@@ -15,6 +19,8 @@ const TEAM_LOGOS: any = {
 };
 
 const MatchCard = ({ match, isLatest }: any) => {
+  const { isAdmin } = useAuth();
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const getPick = (pred: any) => {
     if (!pred) return null;
@@ -35,6 +41,7 @@ const MatchCard = ({ match, isLatest }: any) => {
         borderRadius: '18px',
         padding: '18px',
         marginBottom: '18px',
+        position: 'relative',
         border: isLatest
           ? '1.5px solid #22c55e'
           : '1px solid rgba(255,255,255,0.05)',
@@ -171,7 +178,30 @@ const MatchCard = ({ match, isLatest }: any) => {
       )}
 
       {/* 🔒 STATUS */}
-      <div style={{ marginTop: '12px', textAlign: 'right' }}>
+      <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          {isAdmin && (
+            <button
+              onClick={() => setShowEditModal(true)}
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '6px 10px',
+                cursor: 'pointer',
+                color: 'rgba(255,255,255,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '11px'
+              }}
+              title="Admin Edit"
+            >
+              <Settings size={14} />
+              <span>Edit Match</span>
+            </button>
+          )}
+        </div>
         <span
           style={{
             fontSize: '11px',
@@ -184,6 +214,13 @@ const MatchCard = ({ match, isLatest }: any) => {
           LOCKS CLOSED
         </span>
       </div>
+
+      {showEditModal && (
+        <AdminEditModal
+          match={match}
+          onClose={() => setShowEditModal(false)}
+        />
+      )}
 
     </div>
   );

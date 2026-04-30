@@ -4,13 +4,13 @@ import { getAuth } from "firebase/auth";
 import { getMessaging } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDSrPok0eBRCMeTM2s1wKvWWPqt4SQvLr4",
-  authDomain: "ipl-predictions-a5f10.firebaseapp.com",
-  databaseURL: "https://ipl-predictions-a5f10-default-rtdb.firebaseio.com",
-  projectId: "ipl-predictions-a5f10",
-  storageBucket: "ipl-predictions-a5f10.firebasestorage.app",
-  messagingSenderId: "824242512776",
-  appId: "1:824242512776:web:f27d80519805b0cb1c503d"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);

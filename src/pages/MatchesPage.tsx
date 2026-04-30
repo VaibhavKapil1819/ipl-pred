@@ -1,31 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { db } from '../lib/firebase';
-import { ref, onValue } from 'firebase/database';
+import React, { useState } from 'react';
+import { useMatches } from '../context/MatchContext';
 import FilterBar from '../components/Shared/FilterBar';
 import MatchCard from '../components/Matches/MatchCard';
 import { Calendar } from 'lucide-react';
-import { calculateStats } from '../lib/stats';
 
 const MatchesPage: React.FC = () => {
-  const [matches, setMatches] = useState<any[]>([]);
-  const [playerStats, setPlayerStats] = useState<{ [key: string]: any }>({});
-  const [loading, setLoading] = useState(true);
+  const { matches, playerStats, loading } = useMatches();
   const [filters, setFilters] = useState({ team: '', player: '', status: 'upcoming' });
-
-  useEffect(() => {
-    const unsub = onValue(ref(db, 'matches'), (snap) => {
-      const data = snap.val() || {};
-      const matchList = Object.entries(data)
-        .map(([id, m]: [string, any]) => ({ ...m, id }))
-        .sort((a, b) => (b.ts || 0) - (a.ts || 0));
-      
-      setMatches(matchList);
-      setPlayerStats(calculateStats(matchList));
-      setLoading(false);
-    });
-
-    return () => unsub();
-  }, []);
 
   if (loading) return <div className="no-matches">Loading match schedule...</div>;
 
