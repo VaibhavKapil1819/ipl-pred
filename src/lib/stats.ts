@@ -3,6 +3,7 @@ import { PLAYERS } from './firebase';
 export const calculateStats = (matches: any[]) => {
   const stats: { [key: string]: any } = {};
 
+  // init
   PLAYERS.forEach(p => {
     stats[p.id] = {
       points: 0,
@@ -10,16 +11,21 @@ export const calculateStats = (matches: any[]) => {
       wrong: 0,
       total: 0,
       accuracy: 0,
+
       currentStreak: 0,
       bestStreak: 0,
+
       currentLosingStreak: 0,
       bestLosingStreak: 0,
-      form: []
+
+      form: [] // ✅ FULL history (needed for best streak)
     };
   });
 
-  // sort oldest → newest
-  const sortedMatches = [...matches].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  // 🔥 MUST be sorted oldest → newest
+  const sortedMatches = [...matches].sort(
+    (a, b) => (a.ts || 0) - (b.ts || 0)
+  );
 
   sortedMatches.forEach(m => {
     if (!m.winner) return;
@@ -30,17 +36,17 @@ export const calculateStats = (matches: any[]) => {
       const pred = m.preds?.[p.id];
       const pick = typeof pred === 'object' ? pred.pick : pred;
 
-      // normalize (🔥 VERY IMPORTANT)
+      // normalize
       const userPick = pick?.toString().toLowerCase();
       const actualWinner = m.winner?.toString().toLowerCase();
 
-      if (!userPick) {
-        return; // skip empty
-      }
+      // skip if no prediction
+      if (!userPick) return;
 
       s.total += 1;
 
       if (userPick === actualWinner) {
+        // ✅ WIN
         s.points += 2;
         s.right += 1;
 
@@ -51,8 +57,9 @@ export const calculateStats = (matches: any[]) => {
           s.bestStreak = s.currentStreak;
         }
 
-        s.form.push('W'); // ✅ FIXED
+        s.form.push('W'); // full history
       } else {
+        // ❌ LOSS
         s.wrong += 1;
 
         s.currentStreak = 0;
@@ -62,21 +69,18 @@ export const calculateStats = (matches: any[]) => {
           s.bestLosingStreak = s.currentLosingStreak;
         }
 
-        s.form.push('L'); // ✅ FIXED
-      }
-
-      // keep only last 5
-      if (s.form.length > 5) {
-        s.form.shift();
+        s.form.push('L'); // full history
       }
     });
   });
 
+  // accuracy
   Object.keys(stats).forEach(id => {
     const s = stats[id];
-    s.accuracy = s.total > 0
-      ? Math.round((s.right / s.total) * 100)
-      : 0;
+    s.accuracy =
+      s.total > 0
+        ? Math.round((s.right / s.total) * 100)
+        : 0;
   });
 
   return stats;
