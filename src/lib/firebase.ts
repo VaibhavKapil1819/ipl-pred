@@ -14,15 +14,27 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
 export const db = getDatabase(app);
 export const auth = getAuth(app);
-export const messaging = getMessaging(app);
 
+// ✅ Safe messaging
+let messaging: any = null;
+if (typeof window !== 'undefined' && 'Notification' in window) {
+  try {
+    messaging = getMessaging(app);
+  } catch {
+    console.log("Messaging not supported");
+  }
+}
+export { messaging };
+
+// 🔥 Players with emojis
 export const PLAYERS = [
-  { id: 'sai', name: 'Sai Pavan', short: 'SP', color: '#FF6B00', bg: '#FF6B0020', phone: '918125925934' },
-  { id: 'kar', name: 'Karthik', short: 'KC', color: '#4CAF50', bg: '#4CAF5020', phone: '919849834485' },
-  { id: 'var', name: 'Vaibhav', short: 'VB', color: '#2196F3', bg: '#2196F320', phone: '919392488585' },
-  { id: 'cha', name: 'Charan', short: 'CH', color: '#9C27B0', bg: '#9C27B020', phone: '917013894469' },
+  { id: 'sai', name: 'Sai Pavan', short: 'SP', emoji: '👑', color: '#FF6B00', bg: '#FF6B0020', phone: '918125925934' },
+  { id: 'kar', name: 'Karthik', short: 'KC', emoji: '🦊', color: '#4CAF50', bg: '#4CAF5020', phone: '919849834485' },
+  { id: 'var', name: 'Vaibhav', short: 'VB', emoji: '🦅', color: '#2196F3', bg: '#2196F320', phone: '919392488585' },
+  { id: 'cha', name: 'Charan', short: 'CH', emoji: '🦁', color: '#9C27B0', bg: '#9C27B020', phone: '917013894469' },
 ];
 
 export const ADMIN_EMAIL = 'vaibhavkapilkanuru@gmail.com';
