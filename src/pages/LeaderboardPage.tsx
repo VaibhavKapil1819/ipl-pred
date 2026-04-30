@@ -1,3 +1,4 @@
+// src/pages/LeaderboardPage.tsx
 import React, { useEffect, useState } from 'react';
 import { db } from '../lib/firebase';
 import { ref, onValue } from 'firebase/database';
@@ -8,6 +9,25 @@ import FilterBar from '../components/Shared/FilterBar';
 import { calculateStats } from '../lib/stats';
 import { PLAYERS } from '../lib/firebase';
 
+const getBestStreak = (form: string[] = []) => {
+  if (!form.length) return '-';
+
+  let maxW = 0, maxL = 0;
+  let curr = form[0], count = 1;
+
+  for (let i = 1; i < form.length; i++) {
+    if (form[i] === curr) count++;
+    else {
+      curr === 'W' ? maxW = Math.max(maxW, count) : maxL = Math.max(maxL, count);
+      curr = form[i];
+      count = 1;
+    }
+  }
+
+  curr === 'W' ? maxW = Math.max(maxW, count) : maxL = Math.max(maxL, count);
+  return maxW >= maxL ? `${maxW}W` : `${maxL}L`;
+};
+
 const LeaderboardPage: React.FC = () => {
   const [matches, setMatches] = useState<any[]>([]);
   const [playerStats, setPlayerStats] = useState<{ [key: string]: any }>({});
@@ -15,6 +35,7 @@ const LeaderboardPage: React.FC = () => {
   const [feedFilters, setFeedFilters] = useState({ team: '', player: '', status: 'completed' });
 
   useEffect(() => {
+<<<<<<< Updated upstream
     const unsub = onValue(ref(db, 'matches'), (snap) => {
       const data = snap.val() || {};
       const matchList = Object.entries(data)
@@ -24,11 +45,24 @@ const LeaderboardPage: React.FC = () => {
       setMatches(matchList);
       setPlayerStats(calculateStats(matchList));
       setLoading(false);
+=======
+    const matchesRef = ref(db, 'matches');
+
+    const unsubscribe = onValue(matchesRef, (snap) => {
+      const data = snap.val() || {};
+      const list = Object.entries(data).map(([id, m]: any) => ({ ...m, id }));
+
+      const asc = [...list].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+
+      setMatches(list);
+      setPlayerStats(calculateStats(asc));
+>>>>>>> Stashed changes
     });
 
-    return () => unsub();
+    return () => unsubscribe();
   }, []);
 
+<<<<<<< Updated upstream
   if (loading) return <div className="no-matches">Loading leaderboard...</div>;
 
   const sortedPlayers = [...PLAYERS].sort((a, b) => (playerStats[b.id]?.points || 0) - (playerStats[a.id]?.points || 0));
@@ -110,6 +144,193 @@ const LeaderboardPage: React.FC = () => {
               </div>
             );
           })}
+=======
+  const sorted = [...PLAYERS].sort(
+    (a, b) =>
+      (playerStats[b.id]?.points || 0) -
+      (playerStats[a.id]?.points || 0)
+  );
+
+  const filteredFeed = [...matches].sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+  return (
+    <div className="page">
+
+      <style>{`
+        .page {
+          max-width: 1000px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+        }
+
+        .title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          line-height: 1;
+        }
+
+        .title h2 {
+          margin: 0;
+        }
+
+        .table {
+          width: 100%;
+          border-radius: 12px;
+          overflow: hidden;
+          border: 1px solid rgba(255,255,255,0.06);
+        }
+
+              .row {
+        display: grid;
+        grid-template-columns: 
+          35px 
+          auto   /* 🔥 FIXED */
+          70px 
+          55px 
+          65px 
+          130px 
+          55px 
+          55px;
+
+        column-gap: 6px;
+        padding: 10px 12px;
+        align-items: center;
+        background: #0f172a;
+      }
+
+        .header-row {
+          background: #020617;
+          color: #94a3b8;
+          font-weight: 600;
+          font-size: 12px;
+        }
+
+        .data-row:hover {
+          background: #1e293b;
+        }
+
+        .name-cell {
+          display: flex;
+          align-items: center;
+          gap: 6px; /* 🔥 tighter */
+        }
+
+        .avatar {
+          width: 26px;
+          height: 26px;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .center {
+          text-align: center;
+        }
+
+        .form {
+          display: flex;
+          gap: 5px;
+          justify-content: center;
+        }
+
+        .form-circle {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 9px;
+        }
+
+        .win { background: #22c55e; }
+        .loss { background: #ef4444; }
+
+        .points {
+          font-weight: bold;
+          text-align: center;
+        }
+      `}</style>
+
+      {/* HEADER */}
+      <div className="header">
+        <div className="title">
+          <Trophy size={20} />
+          <h2>Standings</h2>
+        </div>
+
+        <ExportTools />
+      </div>
+
+      {/* TABLE */}
+      <div id="leaderboard-section">
+        <div className="table">
+
+          <div className="row header-row">
+            <div>#</div>
+            <div>Player</div>
+            <div className="center">W-L</div>
+            <div className="center">Total</div>
+            <div className="center">Accuracy</div>
+            <div className="center">Form</div>
+            <div className="center">Best</div>
+            <div className="center">Points</div>
+          </div>
+
+          {sorted.map((p, i) => {
+            const s = playerStats[p.id] || {};
+            const last5 = (s.form || []).slice(-5);
+            const best = getBestStreak(s.form || []);
+
+            return (
+              <div key={p.id} className="row data-row">
+
+                <div>{i + 1}</div>
+
+                <div className="name-cell">
+                  <div className="avatar" style={{ background: p.bg }}>
+                    {(p as any).emoji || p.short}
+                  </div>
+                  {p.name}
+                </div>
+
+                <div className="center">{s.right}-{s.wrong}</div>
+                <div className="center">{s.total}</div>
+                <div className="center">{s.accuracy}%</div>
+
+                <div className="form">
+                  {last5.map((r: string, idx: number) => (
+                    <div key={idx} className={`form-circle ${r === 'W' ? 'win' : 'loss'}`}>
+                      {r}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="center">{best}</div>
+                <div className="points">{s.points}</div>
+
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 🔥 PREDICTION FEED */}
+      <div style={{ marginTop: '60px', paddingTop: '12px' }}>
+
+        <div className="title" style={{ marginBottom: '14px' }}>
+          <Calendar size={16} />
+          <h3>Prediction Feed</h3>
+>>>>>>> Stashed changes
         </div>
 
         <div className="section-title">League Performance Detail</div>
@@ -168,6 +389,7 @@ const LeaderboardPage: React.FC = () => {
           </table>
         </div>
 
+<<<<<<< Updated upstream
         <div style={{ marginTop: '40px', borderTop: '2px dashed var(--bdr)', paddingTop: '30px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px', paddingLeft: '10px' }}>
             <Calendar color="var(--orange)" size={20} />
@@ -186,6 +408,14 @@ const LeaderboardPage: React.FC = () => {
             )}
           </div>
         </div>
+=======
+        <div style={{ marginTop: '14px' }}>
+          {filteredFeed.map((m: any, idx: number) => (
+            <MatchCard key={m.id} match={m} isLatest={idx === 0} />
+          ))}
+        </div>
+
+>>>>>>> Stashed changes
       </div>
 
       <div className="section-title" style={{ marginTop: '30px' }}>Rules of Play</div>

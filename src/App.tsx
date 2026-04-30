@@ -21,7 +21,9 @@ const AppContent: React.FC = () => {
   return (
     <BrowserRouter>
       <Navbar />
-      <main className="container">
+
+      {/* 🔥 FULL WIDTH FIX */}
+      <main style={{ width: '100%' }}>
         <Routes>
           <Route path="/" element={<Navigate to="/matches" replace />} />
           <Route path="/matches" element={<MatchesPage />} />
