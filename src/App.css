@@ -1,65 +1,119 @@
-/* ===== GLOBAL RESET ===== */
+/* ===== GLOBAL ===== */
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  padding: 0;
-  width: 100%;
-  overflow-x: hidden;
-  font-family: system-ui, sans-serif;
   background: #0f172a;
+  font-family: system-ui;
 }
 
-#root {
-  width: 100%;
-}
-
-/* ===== PAGE ===== */
 .page {
-  width: 100%;
-  max-width: 1200px;   /* 🔥 reduced from 1600 */
-  margin: 0 auto;
+  max-width: 820px;
+  margin: auto;
   padding: 20px;
 }
 
-/* ===== TABLE FIX (IMPORTANT) ===== */
-.table {
-  width: 100%;
-  max-width: 900px;    /* 🔥 CONTROL WIDTH */
-  margin: 0 auto;      /* center */
+/* ===== HEADER ===== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-/* ===== ROW GRID FIX ===== */
-.row {
-  display: grid;
-  grid-template-columns: 
-    30px 
-    max-content   /* 🔥 KEY FIX (no stretch) */
-    70px 
-    60px 
-    70px 
-    140px 
-    60px 
-    60px;
-
-  column-gap: 12px;
-  padding: 10px 12px;
+.title {
+  display: flex;
+  gap: 8px;
   align-items: center;
 }
 
-/* ===== PLAYER CELL ===== */
+/* ===== TABLE ===== */
+.table {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* 🔥 MAIN FIX */
+.row {
+  display: grid;
+  grid-template-columns:
+    28px
+    max-content
+    60px
+    50px
+    60px
+    110px
+    55px
+    55px;
+
+  column-gap: 10px;
+  padding: 10px 12px;
+  align-items: center;
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.header-row {
+  background: #020617;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ===== PLAYER ===== */
 .name-cell {
-  display: inline-flex;   /* 🔥 prevents stretch */
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   white-space: nowrap;
 }
 
-/* ===== CENTER TEXT ===== */
+.avatar {
+  width: 24px;
+  height: 24px;
+  background: #1e293b;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== ALIGN ===== */
 .center {
   text-align: center;
+}
+
+/* ===== FORM ===== */
+.form {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.form-circle {
+  width: 16px;
+  height: 16px;
+  font-size: 9px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.win {
+  background: #22c55e;
+}
+
+.loss {
+  background: #ef4444;
+}
+
+.points {
+  font-weight: bold;
 }
 
 /* ===== MOBILE ===== */

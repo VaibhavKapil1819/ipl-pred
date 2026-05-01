@@ -1,7 +1,7 @@
 import React from 'react';
 import { PLAYERS } from '../../lib/firebase';
 
-// ✅ Updated logos (your links)
+/* TEAM LOGOS */
 const TEAM_LOGOS: any = {
   CSK: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/2b/Chennai_Super_Kings_Logo.svg/500px-Chennai_Super_Kings_Logo.svg.png',
   MI: 'https://upload.wikimedia.org/wikipedia/en/c/cd/Mumbai_Indians_Logo.svg',
@@ -29,48 +29,66 @@ const MatchCard = ({ match, isLatest }: any) => {
       : 'loss';
   };
 
+  /* 🔥 SAFE MATCH LABEL */
+  const getMatchLabel = () => {
+    if (!match.num) return '';
+    const n = match.num.toString().toLowerCase();
+    return n.includes('match') ? match.num : `Match ${match.num}`;
+  };
+
   return (
     <div
       style={{
         background: '#0f172a',
+<<<<<<< Updated upstream
         borderRadius: '18px',
         padding: '18px',
         marginBottom: '18px',
+=======
+        borderRadius: '14px',
+        padding: '12px',
+        marginBottom: '12px',
+>>>>>>> Stashed changes
         border: isLatest
           ? '1.5px solid #22c55e'
           : '1px solid rgba(255,255,255,0.05)',
       }}
     >
 
-      {/* 🔝 HEADER */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '14px'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src={TEAM_LOGOS[match.team1]} style={{ width: 34 }} />
+      {/* HEADER */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '10px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <img src={TEAM_LOGOS[match.team1]} style={{ width: 28 }} />
           <b>{match.team1}</b>
         </div>
 
-        <div style={{ opacity: 0.6, fontSize: '13px' }}>VS</div>
+        <div style={{ opacity: 0.6, fontSize: '12px' }}>VS</div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <b>{match.team2}</b>
-          <img src={TEAM_LOGOS[match.team2]} style={{ width: 34 }} />
+          <img src={TEAM_LOGOS[match.team2]} style={{ width: 28 }} />
         </div>
       </div>
 
-      {/* DATE */}
-      <div style={{ fontSize: '12px', opacity: 0.7, marginBottom: '14px' }}>
-        {match.date}
+      {/* DATE + MATCH */}
+      <div style={{
+        fontSize: '11px',
+        opacity: 0.7,
+        marginBottom: '10px',
+        display: 'flex',
+        justifyContent: 'space-between'
+      }}>
+        <span>{match.date}</span>
+        {match.num && <span>{getMatchLabel()}</span>}
       </div>
 
-      {/* 👥 PLAYER CARDS */}
-      <div style={{ display: 'flex', gap: '14px' }}>
+      {/* PLAYER CARDS */}
+      <div style={{ display: 'flex', gap: '10px' }}>
         {PLAYERS.map((p: any) => {
           const rawPred = match.preds?.[p.id];
           const pick = getPick(rawPred);
@@ -82,9 +100,9 @@ const MatchCard = ({ match, isLatest }: any) => {
               key={p.id}
               style={{
                 flex: 1,
-                borderRadius: '14px',
-                padding: '14px',
-                minHeight: '120px',
+                borderRadius: '12px',
+                padding: '10px',
+                minHeight: '95px',
                 textAlign: 'center',
                 border:
                   result === 'win'
@@ -99,22 +117,20 @@ const MatchCard = ({ match, isLatest }: any) => {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
-                gap: '6px'
+                gap: '4px'
               }}
             >
 
-              {/* PLAYER */}
-              <div style={{ fontSize: '11px', color: p.color }}>
+              <div style={{ fontSize: '10px', color: p.color }}>
                 {p.short}
               </div>
 
-              {/* LOGO */}
               {teamKey && TEAM_LOGOS[teamKey] ? (
                 <img
                   src={TEAM_LOGOS[teamKey]}
                   style={{
-                    width: 44,
-                    height: 44,
+                    width: 36,
+                    height: 36,
                     margin: 'auto',
                     objectFit: 'contain'
                   }}
@@ -124,11 +140,11 @@ const MatchCard = ({ match, isLatest }: any) => {
                 <div style={{ opacity: 0.4 }}>—</div>
               )}
 
-              {/* TEAM */}
-              <div style={{ fontSize: '12px' }}>
+              <div style={{ fontSize: '11px' }}>
                 {teamKey || '-'}
               </div>
 
+<<<<<<< Updated upstream
               {/* POINTS */}
               <div
                 style={{
@@ -142,6 +158,18 @@ const MatchCard = ({ match, isLatest }: any) => {
                       : '#94a3b8'
                 }}
               >
+=======
+              <div style={{
+                fontSize: '11px',
+                fontWeight: 500,
+                color:
+                  result === 'win'
+                    ? '#22c55e'
+                    : result === 'loss'
+                      ? '#ef4444'
+                      : '#94a3b8'
+              }}>
+>>>>>>> Stashed changes
                 {result === 'win'
                   ? '+2 pts'
                   : result === 'loss'
@@ -154,23 +182,31 @@ const MatchCard = ({ match, isLatest }: any) => {
         })}
       </div>
 
-      {/* 🏆 WINNER */}
+      {/* WINNER */}
       {match.winner && (
         <div
           style={{
-            marginTop: '16px',
-            padding: '10px',
-            borderRadius: '10px',
+            marginTop: '12px',
+            padding: '8px',
+            borderRadius: '8px',
             background: 'rgba(255,255,255,0.03)',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '6px',
+            fontSize: '12px'
           }}
         >
-          🏆 <b>Winner:</b> {match.winner}
+          🏆 
+          <b>
+            {match.num
+              ? `${getMatchLabel()} Winner:`
+              : 'Winner:'}
+          </b>
+          {match.winner}
         </div>
       )}
 
+<<<<<<< Updated upstream
       {/* 🔒 STATUS */}
       <div style={{ marginTop: '12px', textAlign: 'right' }}>
         <span
@@ -182,10 +218,57 @@ const MatchCard = ({ match, isLatest }: any) => {
             color: '#ef4444'
           }}
         >
+=======
+      {/* FOOTER */}
+      <div style={{
+        marginTop: '12px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+
+        {isAdmin && (
+          <button
+            onClick={() => setShowEditModal(true)}
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '5px 8px',
+              cursor: 'pointer',
+              color: 'rgba(255,255,255,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '10px'
+            }}
+          >
+            <Settings size={12} />
+            Edit
+          </button>
+        )}
+
+        <span style={{
+          fontSize: '10px',
+          padding: '5px 8px',
+          borderRadius: '6px',
+          background: 'rgba(239,68,68,0.1)',
+          color: '#ef4444'
+        }}>
+>>>>>>> Stashed changes
           LOCKS CLOSED
         </span>
       </div>
 
+<<<<<<< Updated upstream
+=======
+      {showEditModal && (
+        <AdminEditModal
+          match={match}
+          onClose={() => setShowEditModal(false)}
+        />
+      )}
+>>>>>>> Stashed changes
     </div>
   );
 };
